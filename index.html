@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+            position: absolute ;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+        }
+        .canvas {
+            border: 2px solid black;
+        }
+        .top, .bottom{
+            display: flex;
+            flex-direction: row;
+            justify-content:space-between;
+            margin: 20px 0px 20px 0px;
+            
+        }
+        .block, input, select, button {
+            width: 80%;
+        }
+
+        .bottom>button{
+            margin: 10px;
+        }
+
+        .top>.block{
+            margin: 10px;
+            
+        }
+        #fontSize{
+            height: 26px;
+            
+        }
+        
+        .block>p{
+            margin: 10px auto;
+            width: 50%;
+        }
+
+        .clear{
+            background-color: rgb(236, 17, 17);
+            border: none;
+            height: 30px;
+            color:white;
+            font-weight: bold;         
+        }
+        .clear:hover{
+            background-color: rgb(250, 70, 70);
+            height: 30px;
+            color:black;
+            cursor: pointer;              
+        }
+
+        .save{
+            background-color: rgb(7, 126, 15);
+            border: none;
+            height: 30px;
+            color:white;
+            font-weight: bold;         
+        }
+        .save:hover{
+            background-color: rgb(97, 250, 70);
+            height: 30px;
+            color:black;
+            cursor: pointer;              
+        }
+        .retrieve{
+            background-color: rgb(47, 47, 245);
+            border: none;
+            height: 30px;
+            color:white;
+            font-weight: bold;         
+        }
+        .retrieve:hover{
+            background-color: rgb(138, 201, 240);
+            height: 30px;
+            color:black;
+            cursor: pointer;              
+        }
+
+        
+        </style>
+   
+    <link rel="icon" href="favicon_io (1)/favicon-16x16.png">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+</head>
+
+<body>
+    <div class="main">
+        <div class="top">
+            <div class="block">
+                <p>Text color picker</p>
+                <input class="text-color" type="color" id="colorPicker" />
+            </div>
+            <div class="block">
+                <p>Background</p>
+                <input class="text-color" type="color" id="canvasColor" />
+            </div>
+            <div class="block">
+                <p>Font Size</p>
+                <select id="fontSize">
+                    <option value="5">5px</option>
+                    <option value="10">10px</option>
+                    <option value="15">15px</option>
+                    <option value="20">20px</option>
+                    <option value="25">25px</option>
+                    <option value="30">30px</option>
+                </select>
+
+            </div>
+        </div>
+        <canvas class="canvas" id="myCanvas" width="750" height="500">
+        </canvas>
+        <div class="bottom">
+            <button class="clear" id="clearButton">Clear</button>
+            <button class="save" id="saveButton">Save & download</button>
+            <button class="retrieve" id="retrieveButton">Retrieve saved signature</button>
+        </div>
+    </div>
+
+    <script>
+        const colorPicker=document.getElementById("colorPicker");
+        const canvasColor=document.getElementById("canvasColor");
+        const canvas =document.getElementById("myCanvas");
+        const clearButton=document.getElementById("clearButton");
+        const saveButton=document.getElementById("saveButton");
+        const retrieveButton=document.getElementById('retrieveButton')
+        const fontSize=document.getElementById("fontSize");
+
+        const ctx=canvas.getContext('2d')
+
+        colorPicker.addEventListener('change', (e)=>{
+            ctx.strokeStyle= e.target.value;
+            ctx.fillStyle=e.target.value;
+        })
+
+        canvas.addEventListener('mousedown',(e)=>{
+            isDrawing=true;
+            lastX=event.offsetX;
+            lastY=event.offsetY;
+        })
+
+         canvas.addEventListener('mousemove',(e)=>{
+            if(isDrawing){
+                ctx.beginPath();
+                ctx.moveTo(lastX,lastY);
+                ctx.lineTo(event.offsetX, event.offsetY);
+                ctx.stroke();
+
+                lastX=event.offsetX;
+                lastY=event.offsetY;
+            }
+         })
+
+        canvas.addEventListener('mouseup', ()=>{
+            isDrawing=false;
+        })
+
+        canvasColor.addEventListener('change',(e)=>{
+            ctx.fillStyle=e.target.value;
+            ctx.fillRect(0,0,750,500);
+        })
+
+        fontSize.addEventListener('change',(e)=>{
+            ctx.lineWidth=e.target.value;
+        })
+
+        clearButton.addEventListener('click',()=>{
+            ctx.clearRect(0,0,canvas.width,canvas.height)
+        })
+
+        saveButton.addEventListener('click',()=>{
+            localStorage.setItem('canvasContents',canvas.toDataURL());
+
+            let link=document.createElement('a');
+
+            link.download='my-canvas.png'
+
+            link.href=canvas.toDataURL();
+            link.click();
+        })
+
+        retrieveButton.addEventListener('click',()=>{
+            let saveCanvas=localStorage.getItem('canvasContents')
+
+            if(saveCanvas){
+            let img =new Image();
+            img.src=saveCanvas;
+            ctx.drawImage(img,0,0)   
+         }
+        })
+        
+
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
